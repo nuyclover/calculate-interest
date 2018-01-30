@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ดอกเบี้ยบ้าน</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+<body>
+	<style type="text/css">
+		.text-center-by-nuy {
+			text-align: center;
+		}
+	</style>
+	<div class="container">
+		<div class="col-md-12">
+		<h3>คำนวนดอกเบี้ย</h3>
+		<hr>
+		</div>
+		<div class="col-md-12">
+		<div id="dvData">
+			<table class="table table-bordered">
+				<thead>
+				<tr>
+					<th>ลำดับ / เดือน</th>
+					<th>จำนวนเงินที่ผ่อน</th>
+					<th>ดอกเบี้ย</th>
+					<th>ยอดเงินต้น</th>
+					<th>ยอดเงินต้นคงเหลือ</th>
+					<th>เงินโป๊ะ</th>
+					<th>ดอกเบี้ย</th>
+				</tr>
+				</thead>
+				<tbody>
+					<div class="body_table">
+						
+					</div>
+				</tbody>
+			</table>
+		</div>
+		</div>
+		<div class="col-md-12" style="text-align: right;">
+			<div class="form-group">
+
+				<div class="col-md-2">
+				<label for="pay">เงินต้น / ยกยอดมา</label>
+				<input class="form-control" type="number" name="money_base" id="money_base" min="0" value="0.00">
+				</div>
+
+
+				<div class="col-md-2">
+				<label for="pay">เงินผ่อน / เดือน</label>
+				<input class="form-control" type="number" name="money_pay" id="money_pay" min="0" value="0.00">
+				</div>
+
+				<div class="col-md-2">
+				<label for="money_interest">ดอกเบี้ย %</label>
+				<input class="form-control" type="number" name="money_interest" id="money_interest" min="0" value="0.00">
+				</div>
+
+				<div class="col-md-2">
+				<label for="money_heap">เงินโปะ</label>
+				<input class="form-control" type="number" name="money_heap" id="money_heap" min="0" value="0.00">
+				</div>
+
+				<div class="col-md-2" style="margin-top:23px;">
+					<input class="btn btn-primary" type="button" name="createBtable" value="เพิ่ม" onclick="createBpermtable()" id="btn_cal">
+				</div>
+
+				<br><br><br><br>
+			</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script>
+	var count = 1;
+	var year = 1;
+	var sum_interest = 0;
+	var pay_money_sum = 0;
+	var sum_poo = 0;
+	var sum_base = 0;
+	function createBpermtable(){
+		
+		var stble = '';
+		var money_base = $('#money_base').val();
+		var money_pay = $('#money_pay').val();
+		var money_interest = $('#money_interest').val();
+		var money_heap = $('#money_heap').val();
+
+
+
+
+
+		//calculate
+		var calculateDok = Math.abs((((money_base * money_interest)/100)/365)*30);
+		var money_baseton = Math.abs(money_heap - (money_pay - calculateDok));
+		var cal_all = Math.abs(money_base - money_baseton);
+
+		console.log('a : ' + cal_all);
+		console.log('b : ' +money_pay);
+
+
+		if(money_pay >= cal_all){
+			$('#money_pay').val(parseFloat(cal_all).toFixed(2));
+			$('#money_pay').attr('readonly', true);
+		}
+
+		if(cal_all == 0){
+			stble += '<tr>';
+			stble += '<td colspan="7" class="danger text-center-by-nuy" ><b>ชำระหนี้หมดแล้ว</b></td>';
+			stble += '</tr>';
+
+			$('#btn_cal').attr('disabled',true);
+
+		}
+
+
+		sum_interest += parseFloat(calculateDok);
+		pay_money_sum += parseFloat(money_pay);
+		sum_poo += parseFloat(money_heap);
+		sum_base += parseFloat(money_baseton);
+		if(cal_all > 0){
+		stble += '<tr>';
+		stble += '<td>'+count+'</td>';
+		stble += '<td>'+parseFloat(money_pay).toFixed(2)+'</td>';
+		stble += '<td>'+parseFloat(calculateDok).toFixed(2)+'</td>';
+		stble += '<td>'+parseFloat(money_baseton).toFixed(2)+'</td>';
+		stble += '<td>'+parseFloat(cal_all).toFixed(2)+'</td>';
+		stble += '<td>'+parseFloat($('#money_heap').val()).toFixed(2)+'</td>';
+		stble += '<td>'+$('#money_interest').val()+' % </td>';
+		stble += '</tr>';
+		}
+
+		if((count % 12) == 0){
+			stble += '<tr class="warning">';
+			stble += '<td><b>รวม</b></td>';
+			stble += '<td>'+parseFloat(pay_money_sum).toFixed(2)+'</td>';
+			stble += '<td>'+parseFloat(sum_interest).toFixed(2)+'</td>';
+			stble += '<td>'+parseFloat(sum_base).toFixed(2)+'</td>';
+			stble += '<td>'+parseFloat(cal_all).toFixed(2)+'</td>';
+			stble += '<td>'+parseFloat(sum_poo).toFixed(2)+'</td>';
+			stble += '<td>'+$('#money_interest').val()+' % </td>';
+			stble += '</tr>';
+			stble += '<tr>';
+			stble += '<td colspan="7" class="success text-center-by-nuy" ><b> Year : '+year+'</b></td>';
+			stble += '</tr>';
+			year += 1;
+		}
+
+		$('tbody').append(stble);
+		count+=1;
+
+
+		$('#money_base').val(parseFloat(cal_all).toFixed(2)).attr('readonly',true);
+
+	}
+</script>
